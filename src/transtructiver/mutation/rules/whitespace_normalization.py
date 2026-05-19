@@ -251,9 +251,6 @@ class WhitespaceNormalizationRule(MutationRule):
 
         if not self._is_empty_line(node, siblings, idx):
             return []
-        # print(
-        #     f"SHOULD DELETE THIS ONE! node type: {node.type}, text: '{node.text}', start_point: {node.start_point}, end_point: {node.end_point}'"
-        # )
         to_delete.append(node)
 
         # Skip whitespace after newline
