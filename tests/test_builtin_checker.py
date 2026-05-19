@@ -13,6 +13,7 @@ def test_python_builtins():
     """Test Python builtins detection."""
     assert is_builtin("int", PY)
     assert is_builtin("len", PY)
+    assert not is_builtin("b", PY)
     assert not is_builtin("my_custom_func", PY)
 
 

@@ -292,6 +292,8 @@ class ProfileDict(dict):
         name_tokens = _builtin_tokens(name)
         if len(name_tokens) == 1:
             token = next(iter(name_tokens))
+            if len(token) <= 1:
+                return False
             if token in self.token_index:
                 # Check if any indexed name contains this token in a matching position
                 for indexed_name in self.token_index[token]:
