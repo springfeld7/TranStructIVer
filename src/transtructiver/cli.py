@@ -316,9 +316,14 @@ def run_pipeline(
             if not code or not language:
                 continue
 
-            start_cst, parse_err = parser.parse(code, language)
+            cached_cst = row.get("mutated_cst")
+            if cached_cst:
+                orig_cst = Node.from_json(cached_cst)
+                parse_err = None
+            else:
+                orig_cst, parse_err = parser.parse(code, language)
 
-            if start_cst is None:
+            if orig_cst is None:
                 stats.parse_skipped += 1
                 _prototype_log(f"  Skipped ({parse_err})")
                 processed_since_checkpoint += 1
@@ -331,25 +336,19 @@ def run_pipeline(
                 continue
 
             stats.parsed_ok += 1
-            _prototype_pretty("Original tree:", start_cst)
+            _prototype_pretty("Original tree:", orig_cst)
 
             # Clone before mutation so we keep the clean original for comparison
-            mut_cst = start_cst.clone()
+            mut_cst = orig_cst.clone()
+
             engine.apply_mutations(mut_cst)
-
             _prototype_pretty("\nMutated code:", mut_cst)
-
-            cached_original_cst = row.get("original_cst")
-            if cached_original_cst:
-                orig_cst = Node.from_json(cached_original_cst)
-            else:
-                orig_cst = start_cst
 
             # Write manifest for this snippet
             outputs.write_manifest(idx, snippet_id, engine.manifest.to_dict())
 
             # Write original/mutated code pair
-            original_code = start_cst.to_code()
+            original_code = orig_cst.to_code()
             mutated_code = mut_cst.to_code()
 
             # Keep all other metadata fields from the original row, except code/language which we handle separately
@@ -365,7 +364,7 @@ def run_pipeline(
                 language,
                 has_mutation_applied=not engine.manifest.is_empty(),
                 metadata=metadata,
-                original_cst=orig_cst,
+                mutated_cst=mut_cst,
             )
 
             # Verify semantic preservation and append to summary log

@@ -177,7 +177,7 @@ class OutputManager:
                 ("snippet_id", pa.string()),
                 ("original_code", pa.string()),
                 ("mutated_code", pa.string()),
-                ("original_cst", pa.string()),
+                ("mutated_cst", pa.string()),
                 ("language", pa.string()),
                 ("has_mutation_applied", pa.bool_()),
             ]
@@ -220,7 +220,7 @@ class OutputManager:
         language: str,
         has_mutation_applied: bool = False,
         metadata: dict | None = None,
-        original_cst: Node | None = None,
+        mutated_cst: Node | None = None,
     ) -> None:
         """Append one original/mutated code pair row to parquet output.
 
@@ -232,7 +232,7 @@ class OutputManager:
             language (str): Programming language of the snippet.
             has_mutation_applied (bool): Whether any mutation was applied.
             metadata (dict | None): Additional dataset metadata (e.g., char_count, lloc, label).
-            original_cst (Node | None): Original CST to cache for later tiers.
+            mutated_cst (Node | None): Original CST to cache for later tiers.
         """
 
         # Base row (core schema)
@@ -240,7 +240,7 @@ class OutputManager:
             "snippet_id": [snippet_id],
             "original_code": [original_code],
             "mutated_code": [mutated_code],
-            "original_cst": [original_cst.to_json() if original_cst else None],
+            "mutated_cst": [mutated_cst.to_json() if mutated_cst else None],
             "language": [language],
             "has_mutation_applied": [has_mutation_applied],
         }

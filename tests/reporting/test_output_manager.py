@@ -47,3 +47,30 @@ def test_output_manager_writes_manifest_and_dataset(tmp_path):
     payload = json.loads(manifest_file.read_text(encoding="utf-8").strip())
     assert payload["snippet_id"] == "row_0"
     assert payload["entries"][0]["node_id"] == [0, 0]
+
+
+def test_output_manager_writes_mutated_cst(tmp_path):
+    """Test OutputManager stores mutated CST in the dataset output."""
+    module = importlib.import_module("transtructiver.reporting.output_manager")
+    node_module = importlib.import_module("transtructiver.node")
+    parquet = importlib.import_module("pyarrow.parquet")
+
+    mutated_cst = node_module.Node((0, 0), (0, 1), "identifier", text="x")
+
+    with module.OutputManager(
+        str(tmp_path), max_rows_per_shard=0, compress_output=False
+    ) as manager:
+        manager.write_dataset_row(
+            0,
+            "row_0",
+            "original",
+            "mutated",
+            "python",
+            mutated_cst=mutated_cst,
+        )
+
+    dataset_file = tmp_path / "augmented_dataset.parquet"
+    table = parquet.read_table(dataset_file)
+    data = table.to_pydict()
+
+    assert data["mutated_cst"][0] == mutated_cst.to_json()

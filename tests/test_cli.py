@@ -94,7 +94,7 @@ def test_run_pipeline_happy_path_writes_artifacts_and_summary(monkeypatch, tmp_p
             language,
             has_mutation_applied,
             metadata,
-            original_cst=None,
+            mutated_cst=None,
         ):
             metadata = {
                 "char_count": 1,
@@ -117,7 +117,7 @@ def test_run_pipeline_happy_path_writes_artifacts_and_summary(monkeypatch, tmp_p
                     language,
                     has_mutation_applied,
                     metadata,
-                    original_cst,
+                    mutated_cst,
                 )
             )
 
@@ -264,7 +264,7 @@ def test_run_pipeline_use_cached_original_cst_on_mutated_code(monkeypatch, tmp_p
                         "original_code": snippet,
                         "mutated_code": mut_snippet,
                         "language": "python",
-                        "original_cst": json_cst,
+                        "mutated_cst": json_cst,
                     },
                 )
             ]

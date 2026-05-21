@@ -284,6 +284,10 @@ class ProfileDict(dict):
         if not name:
             return False
 
+        # Single-character identifiers are too noisy in profiles to treat as builtins.
+        if len(name) < 3:
+            return False
+
         # Fast path: exact match in precomputed set
         if name in self.exact_names:
             return True
